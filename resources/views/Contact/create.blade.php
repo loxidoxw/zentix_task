@@ -1,6 +1,6 @@
 @extends('Layouts.app')
 @section('content')
-<form class="row g-3">
+<form class="row g-3" id="add-contact-form" action="{{route('contact.store')}}" method="post">
     @csrf
     <div class="col-md-4">
         <label for="validationDefault01" class="form-label">First </label>
@@ -13,15 +13,16 @@
     <div class="col-md-4">
         <label for="validationDefaultUsername" class="form-label">Phone Number</label>
         <div class="input-group">
-            <button class="input-group-text" id="add-phone">+</button>
+            <button type="button" class="input-group-text" id="add-phone">+</button>
             <input type="text" name="number" class="form-control" id="validationDefaultUsername" aria-describedby="inputGroupPrepend2" required>
         </div>
     </div>
     <div class="col-12">
         <button class="btn btn-primary" type="submit">Submit form</button>
     </div>
-</form>
 
+    <div id="phones" class="col-12 mt-2"></div>
+</form>
 <div class="content-table">
 <table class="table">
     <thead>
@@ -48,6 +49,12 @@
 
 @push('scripts')
     <script>
+        document.getElementById('add-contact-form').addEventListener('submit', function (event)
+        {
+            event.preventDefault();
+            alert('Form Submitted');
+        });
+
         document.querySelector('#add-phone').addEventListener('click', function () {
             const phoneField = document.createElement('div');
             phoneField.classList.add('row', 'g-2', 'mb-2', 'phone-group');

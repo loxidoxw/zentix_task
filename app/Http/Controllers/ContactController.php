@@ -15,5 +15,8 @@ class ContactController extends Controller
         return view('contact.create', compact('contacts'));
     }
 
-
+   public function store()
+   {
+       dd('store');
+   }
 }
