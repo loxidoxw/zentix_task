@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-       $contacts=Contact::factory()->count(10)->create();
+       $contacts=Contact::factory()->count(20)->create();
 
        $contacts->each(function ($contact) {
            Phone::factory()->count(random_int(1,3))->create(['contact_id'=>$contact->id]);
