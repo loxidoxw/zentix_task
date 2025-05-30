@@ -6,17 +6,27 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\AddContactRequest;
 use App\Models\Contact;
 use App\Models\Phone;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class ContactController extends Controller
 {
+    /**
+     * @param $ajax
+     * @return string
+     */
     public function index($ajax = false): string
     {
-        $contacts=Contact::with('phoneNumbers')->orderBy('id', 'DESC')->paginate(10);
+        $contacts = Contact::with('phoneNumbers')->orderBy('id', 'DESC')->paginate(10);
 
         return view('contact.index', compact('contacts', 'ajax'))->render();
     }
 
+    /**
+     * @param AddContactRequest $request
+     * @return JsonResponse|RedirectResponse
+     */
     public function store(AddContactRequest $request)
     {
         $validated = $request->validated();
@@ -47,14 +57,23 @@ class ContactController extends Controller
         return redirect()->route('contact.index')->with('success', 'Contact created successfully.');
     }
 
+    /**
+     * @param Contact $contact Екземпляр моделі Contact, який потрібно відредагувати.
+     * @return \Illuminate\View\View Представлення з формою редагування контакту.
+     */
    public function edit(Contact $contact)
    {
        $contact->load('phoneNumbers');
        return view('contact.edit', compact('contact'));
    }
 
-   public function update(AddContactRequest $request, Contact $contact)
-   {
+    /**
+     * @param AddContactRequest $request
+     * @param Contact $contact
+     * @return RedirectResponse
+     */
+    public function update(AddContactRequest $request, Contact $contact): RedirectResponse
+    {
        $validated = $request->validated();
 
        $contact->update([
@@ -74,7 +93,11 @@ class ContactController extends Controller
        return redirect()->route('contact.index')->with('success', 'Contact updated successfully.');
    }
 
-    public function destroy(Contact $contact)
+    /**
+     * @param Contact $contact
+     * @return RedirectResponse
+     */
+    public function destroy(Contact $contact): RedirectResponse
     {
         $contact->phoneNumbers()->delete();
         $contact->delete();

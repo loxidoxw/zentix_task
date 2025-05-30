@@ -8,10 +8,12 @@
             <label for="validationDefault01" class="form-label">First </label>
             <input type="text" name="firstName" class="form-control" id="validationDefault01" placeholder="Enter Your First Name"  required>
         </div>
+
         <div class="col-md-4">
             <label for="validationDefault02" class="form-label">Last name</label>
             <input type="text" name="lastName" class="form-control" id="validationDefault02" placeholder="Enter Your Last Name"  required>
         </div>
+
         <div class="col-12">
             <label class="form-label">Phone Numbers</label>
             <div class="row g-2 mb-2" id="phones">
@@ -26,12 +28,14 @@
                 </div>
             </div>
         </div>
+
         <div class="col-auto">
             <button class="btn btn-primary" type="submit">Submit</button>
         </div>
     </form>
 
     <div id="success-message" class="alert" style="display: none;"></div>
+
     <div class="content-table">
         @include('Partials.contact-table')
     </div>
@@ -81,7 +85,7 @@
             });
 
             document.querySelector('#add-phone').addEventListener('click', function () {
-                const phoneField = document.createElement('div');
+                const phoneField = document.createElement('div'); // create input for a new number
                 phoneField.classList.add('row', 'g-2', 'mb-2', 'phone-group');
                 phoneField.innerHTML = `
                         <div class="col-md-4">
@@ -95,7 +99,7 @@
 
             document.addEventListener('click', function (e) {
                 if (e.target.classList.contains('remove-phone')) {
-                    e.target.closest('.phone-group').remove();
+                    e.target.closest('.phone-group').remove();  // remove number button
                 }
             });
 
@@ -103,7 +107,7 @@
                 let res = true;
                 form.querySelectorAll('[required]').forEach(function (field) {
                     if (!field.value || (field.name.includes('phoneNumbers') && !/^\+\d{7,15}$/.test(field.value))) {
-                        field.classList.add('is-invalid');
+                        field.classList.add('is-invalid');  // check if fields are not empty and format number is correct
                         res = false;
                     } else {
                         field.classList.remove('is-invalid');
