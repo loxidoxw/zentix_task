@@ -10,28 +10,75 @@ use Illuminate\Http\Request;
 
 class ContactController extends Controller
 {
-    public function create()
+    public function index($ajax = false): string
     {
-        $contacts=Contact::with('phoneNumbers')->paginate(10);
+        $contacts=Contact::with('phoneNumbers')->orderBy('id', 'DESC')->paginate(10);
 
-        return view('contact.create', compact('contacts'));
+        return view('contact.index', compact('contacts', 'ajax'))->render();
     }
 
-   public function store(AddContactRequest $request)
-   {
-       $request->validated();
+    public function store(AddContactRequest $request)
+    {
+        $validated = $request->validated();
 
-       $contact = Contact::create([
-           'firstName'=>$request->firstName,
-           'lastName'=>$request->lastName
+        $contact = Contact::create([
+            'firstName' => $validated['firstName'],
+            'lastName' => $validated['lastName'],
+        ]);
+
+        foreach ($validated['phoneNumbers'] as $number) {
+            Phone::create([
+                'contact_id' => $contact->id,
+                'phoneNumber' => $number
+            ]);
+        }
+
+        if ($request->ajax()) {
+
+            $contacts=Contact::with('phoneNumbers')->orderBy('id', 'DESC')->paginate(10);
+
+            return response()->json([
+                'message' => 'Contact created successfully.',
+                'result' => 'success',
+                'html' => $this->index(true)
+            ], 200);
+        }
+
+        return redirect()->route('contact.index')->with('success', 'Contact created successfully.');
+    }
+
+   public function edit(Contact $contact)
+   {
+       $contact->load('phoneNumbers');
+       return view('contact.edit', compact('contact'));
+   }
+
+   public function update(AddContactRequest $request, Contact $contact)
+   {
+       $validated = $request->validated();
+
+       $contact->update([
+           'firstName' => $validated['firstName'],
+           'lastName' => $validated['lastName'],
        ]);
 
-       foreach ($request->phoneNumbers as $phoneNumber)
-       {
-           Phone::create([
-               'contact_id' => $contact->id,
-               'phoneNumber' => $phoneNumber
+
+       $contact->phoneNumbers()->delete();
+
+       foreach ($validated['phoneNumbers'] as $number) {
+           $contact->phoneNumbers()->create([
+               'phoneNumber' => $number
            ]);
        }
+
+       return redirect()->route('contact.index')->with('success', 'Contact updated successfully.');
    }
+
+    public function destroy(Contact $contact)
+    {
+        $contact->phoneNumbers()->delete();
+        $contact->delete();
+
+        return redirect()->route('contact.index')->with('success');
+    }
 }
